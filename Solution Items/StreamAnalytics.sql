@@ -21,3 +21,10 @@ INTO
     [ToServiceBus]
 FROM
     [FromIoT]
+
+SELECT
+    DeviceId, Temperature, Humidity, PM25, SendDateTime as time
+INTO
+    [ToPowerBI]
+FROM
+    [FromIoT]
