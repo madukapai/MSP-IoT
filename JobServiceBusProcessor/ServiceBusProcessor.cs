@@ -8,6 +8,7 @@ using System.Configuration;
 using System.IO;
 using Newtonsoft.Json;
 using System.Data.SqlClient;
+using Microsoft.ServiceBus.Notifications;
 
 namespace JobServiceBusProcessor
 {
@@ -15,6 +16,9 @@ namespace JobServiceBusProcessor
     {
         private static string strServiceBusConnectinString = ConfigurationSettings.AppSettings["ServiceBusConnectionString"].ToString();
         private static string strQueueName = ConfigurationSettings.AppSettings["ServiceBusQueue"].ToString();
+        private static string strNotificationConnectionString = ConfigurationSettings.AppSettings["NotificationConnectionString"].ToString();
+        private static string strNotificationHubName = ConfigurationSettings.AppSettings["NotificationHubName"].ToString();
+
         private static SqlCommand SqlCmd = new SqlCommand();
         private static SqlConnection SqlConn = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ToString());
 
@@ -31,7 +35,7 @@ namespace JobServiceBusProcessor
             options.AutoRenewTimeout = TimeSpan.FromMinutes(1);
 
             // Callback to handle received messages.
-            qc.OnMessage((message) =>
+            qc.OnMessage(async (message) =>
             {
                 try
                 {
@@ -47,7 +51,11 @@ namespace JobServiceBusProcessor
                         // 寫入至過載資料庫
                         if (obj.Temperature >= 40 || obj.Humidity >= 60 || obj.PM25 > decimal.Parse("0.3"))
                         {
+                            // 寫入過載資料庫
                             InsertOverEvents(obj);
+
+                            // 發送Notification訊息
+                            await SendAndroidNotificationAsync(obj);
                         }
 
                         Console.WriteLine("Body: " + msg);
@@ -95,6 +103,24 @@ namespace JobServiceBusProcessor
             Console.WriteLine("Insert To IoTOverEvents:" + SqlCmd.CommandText);
 
             SqlCmd.ExecuteNonQuery();
+        }
+
+        private static async Task SendAndroidNotificationAsync(Models.SensorData objData)
+        {
+            string strMessageContent = "{ data:{ message:'DeviceId：{0}發生異常，啟動日期：{1}'} }";
+
+            // 建立Notification的連線
+            NotificationHubClient hub = NotificationHubClient.CreateClientFromConnectionString
+                (
+                strNotificationConnectionString,
+                strNotificationHubName
+                );
+
+            // 準備Notification的訊息內容並送出
+            var toast = strMessageContent.Replace("{0}", objData.DeviceId);
+            toast = toast.Replace("{1}", objData.SendDateTime.ToString());
+            var results = await hub.SendGcmNativeNotificationAsync(toast);
+            Console.WriteLine(results);
         }
     }
 }
