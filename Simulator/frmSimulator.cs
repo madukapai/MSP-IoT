@@ -18,6 +18,7 @@ namespace Simulator
     {
         // 定義IoT Hub物件
         static DeviceClient deviceIoT = null;
+        static string iotHubUri = ConfigurationSettings.AppSettings["IoTHubUrl"].ToString();
 
         public frmSimulator()
         {
@@ -41,6 +42,7 @@ namespace Simulator
             // 組合Json字串
             Models.SensorData objData = new Models.SensorData()
             {
+                DeviceId = txtDeviceId.Text,
                 Temperature = decimal.Parse(txtTemperature.Text),
                 Humidity = decimal.Parse(txtHumidity.Text),
                 PM25 = decimal.Parse(txtPM25.Text),
@@ -80,8 +82,9 @@ namespace Simulator
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private async void tiSend_Tick(object sender, EventArgs e)
-        {
-            string iotHubUri = ConfigurationSettings.AppSettings["IoTHubUrl"].ToString();
+        {            
+            // 重新更改一次數據
+            this.ChangeSensorValue(sender, e);
 
             // 設定送出的訊息協定
             TransportType objTransType = TransportType.Mqtt;

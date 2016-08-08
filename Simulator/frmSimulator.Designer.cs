@@ -225,7 +225,7 @@
             this.Controls.Add(this.txtTemperature);
             this.Controls.Add(this.txtDeviceKey);
             this.Controls.Add(this.txtDeviceId);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "frmSimulator";
             this.Text = "模擬器";
             this.ResumeLayout(false);
