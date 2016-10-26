@@ -11,6 +11,8 @@ using System.Windows.Forms;
 using Newtonsoft.Json;
 using Microsoft.Azure.Devices.Client;
 using System.Configuration;
+using System.Net;
+using System.IO;
 
 namespace Simulator
 {
@@ -19,6 +21,7 @@ namespace Simulator
         // 定義IoT Hub物件
         static DeviceClient deviceIoT = null;
         static string iotHubUri = ConfigurationSettings.AppSettings["IoTHubUrl"].ToString();
+        static string iotGatewayUri = ConfigurationSettings.AppSettings["IoTGateway"].ToString();
 
         public frmSimulator()
         {
@@ -91,8 +94,18 @@ namespace Simulator
 
             try
             {
-                deviceIoT = DeviceClient.Create(iotHubUri, new DeviceAuthenticationWithRegistrySymmetricKey(txtDeviceId.Text, txtDeviceKey.Text), objTransType);
-                await deviceIoT.SendEventAsync(new Microsoft.Azure.Devices.Client.Message(Encoding.UTF8.GetBytes(txtData.Text)));
+                if (cbxSendToGateway.Checked)
+                {
+                    // 送出至IoT Gateway
+                    HttpStatusCode code = HttpStatusCode.OK;
+                    this.CallGraphAPI(iotGatewayUri, "POST", txtData.Text, out code);
+                }
+                else
+                {
+                    // 送出至IoT hub
+                    deviceIoT = DeviceClient.Create(iotHubUri, new DeviceAuthenticationWithRegistrySymmetricKey(txtDeviceId.Text, txtDeviceKey.Text), objTransType);
+                    await deviceIoT.SendEventAsync(new Microsoft.Azure.Devices.Client.Message(Encoding.UTF8.GetBytes(txtData.Text)));
+                }
 
                 lblMessage.Text = $"訊息已送出：{DateTime.Now}";
             }
@@ -110,6 +123,40 @@ namespace Simulator
         private void txtFrequency_Leave(object sender, EventArgs e)
         {
             tiSend.Interval = int.Parse(txtFrequency.Text);
+        }
+
+        private string CallGraphAPI(string strUrl, string strHttpMethod, string strPostContent, out HttpStatusCode code)
+        {
+            HttpWebRequest request = HttpWebRequest.Create(strUrl) as HttpWebRequest;
+            // request.Headers.Add(HttpRequestHeader.Authorization, "Bearer " + token);
+            request.Headers.Add("Ocp-Apim-Subscription-Key", Properties.Settings.Default.FaceAPIKey.Trim());
+            request.Method = strHttpMethod;
+            code = HttpStatusCode.OK;
+
+            if (strPostContent != "" && strPostContent != string.Empty)
+            {
+                request.KeepAlive = true;
+                request.ContentType = "application/json";
+
+                byte[] bs = Encoding.ASCII.GetBytes(strPostContent);
+                Stream reqStream = request.GetRequestStream();
+                reqStream.Write(bs, 0, bs.Length);
+            }
+
+            string strReturn = "";
+            try
+            {
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                var respStream = response.GetResponseStream();
+                strReturn = new StreamReader(respStream).ReadToEnd();
+            }
+            catch (Exception e)
+            {
+                strReturn = e.Message;
+                code = HttpStatusCode.NotFound;
+            }
+
+            return strReturn;
         }
     }
 }

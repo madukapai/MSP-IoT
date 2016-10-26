@@ -47,6 +47,7 @@
             this.txtData = new System.Windows.Forms.TextBox();
             this.tiSend = new System.Windows.Forms.Timer(this.components);
             this.lblMessage = new System.Windows.Forms.Label();
+            this.cbxSendToGateway = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // txtDeviceId
@@ -103,7 +104,7 @@
             // 
             this.btnStart.Location = new System.Drawing.Point(711, 299);
             this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(75, 23);
+            this.btnStart.Size = new System.Drawing.Size(75, 36);
             this.btnStart.TabIndex = 3;
             this.btnStart.Text = "Start";
             this.btnStart.UseVisualStyleBackColor = true;
@@ -114,7 +115,7 @@
             this.btnStop.Enabled = false;
             this.btnStop.Location = new System.Drawing.Point(792, 299);
             this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(75, 23);
+            this.btnStop.Size = new System.Drawing.Size(75, 36);
             this.btnStop.TabIndex = 3;
             this.btnStop.Text = "Stop";
             this.btnStop.UseVisualStyleBackColor = true;
@@ -199,15 +200,26 @@
             this.lblMessage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblMessage.Location = new System.Drawing.Point(12, 299);
             this.lblMessage.Name = "lblMessage";
-            this.lblMessage.Size = new System.Drawing.Size(693, 60);
+            this.lblMessage.Size = new System.Drawing.Size(693, 71);
             this.lblMessage.TabIndex = 11;
             this.lblMessage.Text = "[Message]";
+            // 
+            // cbxSendToGateway
+            // 
+            this.cbxSendToGateway.AutoSize = true;
+            this.cbxSendToGateway.Location = new System.Drawing.Point(711, 342);
+            this.cbxSendToGateway.Name = "cbxSendToGateway";
+            this.cbxSendToGateway.Size = new System.Drawing.Size(153, 28);
+            this.cbxSendToGateway.TabIndex = 12;
+            this.cbxSendToGateway.Text = "Send to GW";
+            this.cbxSendToGateway.UseVisualStyleBackColor = true;
             // 
             // frmSimulator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(879, 368);
+            this.ClientSize = new System.Drawing.Size(879, 387);
+            this.Controls.Add(this.cbxSendToGateway);
             this.Controls.Add(this.lblMessage);
             this.Controls.Add(this.txtData);
             this.Controls.Add(this.panel1);
@@ -253,6 +265,7 @@
         private System.Windows.Forms.TextBox txtData;
         private System.Windows.Forms.Timer tiSend;
         private System.Windows.Forms.Label lblMessage;
+        private System.Windows.Forms.CheckBox cbxSendToGateway;
     }
 }
 

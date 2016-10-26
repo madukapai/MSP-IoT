@@ -243,3 +243,4 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/JobServiceBusProcessor/Properties/PublishProfiles/msplabjob - Web Deploy.pubxml
