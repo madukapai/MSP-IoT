@@ -129,7 +129,7 @@ namespace Simulator
         {
             HttpWebRequest request = HttpWebRequest.Create(strUrl) as HttpWebRequest;
             // request.Headers.Add(HttpRequestHeader.Authorization, "Bearer " + token);
-            request.Headers.Add("Ocp-Apim-Subscription-Key", Properties.Settings.Default.FaceAPIKey.Trim());
+            // request.Headers.Add("Ocp-Apim-Subscription-Key", Properties.Settings.Default.FaceAPIKey.Trim());
             request.Method = strHttpMethod;
             code = HttpStatusCode.OK;
 
